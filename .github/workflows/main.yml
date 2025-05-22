@@ -37,7 +37,7 @@ jobs:
           pip install mlflow
       #Run MLflow project
       - name: Run mlflow project
-        run: mlflow run MLproject --env-manager=local
+        run: mlflow run . --env-manager=local
       #Install Git LFS
       - name: Setup Git LFS
         run: |
