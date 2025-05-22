@@ -5,21 +5,10 @@ conda_env: conda.yaml
 entry_points:
   main:
     parameters:
-      n_estimators:
-        type: int
-        default: 50
-      max_depth:
-        type: int
-        default: 5
+      n_estimators: { type: int, default: 50 }
+      max_depth: { type: int, default: 5 }
       train_dataset:
-        type: string
-        default: "obesity_data_train_preprocessing.csv"
+        { type: string, default: "obesity_data_train_preprocessing.csv" }
       test_dataset:
-        type: string
-        default: "obesity_data_test_preprocessing.csv"
-    command: >
-      python modelling.py
-        --n_estimators {n_estimators}
-        --max_depth {max_depth}
-        --train {train_dataset}
-        --test {test_dataset}
+        { type: string, default: "obesity_data_test_preprocessing.csv" }
+    command: "python modelling.py {n_estimators} {max_depth} {train_dataset} {test_dataset}"
