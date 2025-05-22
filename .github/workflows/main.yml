@@ -1,0 +1,64 @@
+name: obesity-classification MLflow
+
+on:
+  push:
+    branches:
+      - main
+  pull_request:
+    branches:
+      - main
+
+env:
+  TRAIN_CSV: "dataset/obesity_data_train_preprocessing.csv"
+  TEST_CSV: "dataset/obesity_data_test_preprocessing.csv"
+  TARGET_VAR: "ObesityCategory"
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    steps:
+    #Checkout Repository
+      - uses: actions/checkout@v3
+      #Set up python
+      - name: Set up Python 3.11.1
+        uses: actions/setup-python@v4
+        with:
+          python-version: "3.11.1"
+      #Check Env
+      - name: Check Environment
+        run: |
+          echo $TRAIN_CSV
+          echo $TEST_CSV
+      #Install Dependensi
+      - name: Install dependencies
+        run: |
+          python -m pip install --upgrade pip
+          pip install mlflow
+      #Run MLflow project
+      - name: Run mlflow project
+        run: mlflow run MLproject --env-manager=local
+      #Install Git LFS
+      - name: Setup Git LFS
+        run: |
+          sudo apt update
+          sudo apt install -y git-lfs
+          git lfs install
+          git lfs track "*.pkl"
+      #Setup Git Auth & Commit
+      - name: Save mlruns to repo with LFS
+        env:
+          USERNAME: ${{ secrets.USERNAME }}
+          EMAIL:    ${{ secrets.EMAIL }}
+        run: |
+          git config --global user.name  "${USERNAME}"
+          git config --global user.email "${EMAIL}"
+          git remote set-url origin https://x-access-token:${{ secrets.GITHUB_TOKEN }}@github.com/${{ github.repository }}.git
+
+          git add -f .gitattributes
+          git add -f mlruns/
+
+          git diff --cached --quiet || git commit -m "Save mlruns from CI run using Git LFS"
+          git push origin main
+      
+      
